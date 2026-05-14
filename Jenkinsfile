@@ -21,7 +21,7 @@ pipeline {
 
         stage('Sonar Scan') {
             steps {
-                withSonarQubeEnv('sonar') {
+                withSonarQubeEnv('SonarQube') {
                     sh """
                     ${SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=gatewayservice \
