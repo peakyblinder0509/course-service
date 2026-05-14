@@ -5,7 +5,7 @@ pipeline {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "my-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        HARBOR_URL = "192.168.1.44"
+        HARBOR_URL = "192.168.1.46"
         PROJECT    = "library"
  
     }
@@ -16,7 +16,7 @@ pipeline {
             steps {
                 git branch: 'main',
                     credentialsId: 'git-cred',
-                    url: 'https://github.com/peakyblinder0509/crm-backend-gatewayservice.git'
+                    url: 'https://github.com/peakyblinder0509/course-service.git
             }
         }
  
