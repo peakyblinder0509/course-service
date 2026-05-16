@@ -13,7 +13,7 @@ pipeline {
 
         stage('Git Checkout') {
             steps {
-                git branch: 'maste',
+                git branch: 'main',
                     credentialsId: 'git-cred',
                     url: 'https://github.com/peakyblinder0509/course-service.git'
             }
