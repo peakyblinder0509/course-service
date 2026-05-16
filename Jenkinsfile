@@ -4,14 +4,14 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "my-app"
-        IMAGE_TAG = "${BUILD_NUMBER}"
-        HARBOR_URL = "192.168.1.46"
-        PROJECT = "library"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        HARBOR_URL = "harbor-node1.com"
+        PROJECT    = "crm-adminpanel"
     }
 
     stages {
 
-        stage('Git checkout') {
+        stage('Git Checkout') {
             steps {
                 git branch: 'main',
                     credentialsId: 'git-cred',
@@ -19,13 +19,29 @@ pipeline {
             }
         }
 
-        stage('Sonar Scan') {
+        stage('Check Files') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
+        stage('NPM Install') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar-scanner') {
                     sh """
-                    ${SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=gatewayservice \
-                    -Dsonar.sources=.
+                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=course-service \
+                        -Dsonar.projectName=course-service \
+                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=node_modules/**,build/**
                     """
                 }
             }
@@ -33,24 +49,21 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true, credentialsId: 'sonar-crd'
                 }
             }
         }
 
-        stage('Image Build') {
+        stage('Docker Build') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .'
             }
         }
 
         stage('Tag Docker Image') {
             steps {
-                sh """
-                docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
-                ${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}
-                """
+                sh 'docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}'
             }
         }
 
@@ -61,19 +74,14 @@ pipeline {
                     usernameVariable: 'HARBOR_USER',
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
-
-                    sh """
-                    docker login ${HARBOR_URL} \
-                    -u ${HARBOR_USER} \
-                    -p ${HARBOR_PASS}
-                    """
+                    sh 'echo "$HARBOR_PASS" | docker login harbor-node1.com -u "$HARBOR_USER" --password-stdin'
                 }
             }
         }
 
         stage('Push To Harbor') {
             steps {
-                sh "docker push ${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
+                sh 'docker push ${HARBOR_URL}/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}'
             }
         }
     }
@@ -81,12 +89,11 @@ pipeline {
     post {
         always {
             sh """
-            echo "Removing only old images of my-app..."
-
-            docker images my-app --format "{{.Tag}}" | \
+            echo "Removing old Docker images..."
+            docker images ${IMAGE_NAME} --format "{{.Tag}}" | \
             grep -v "${BUILD_NUMBER}" | while read tag; do
-                echo "Removing my-app:\$tag"
-                docker rmi my-app:\$tag || true
+                echo "Removing ${IMAGE_NAME}:\$tag"
+                docker rmi ${IMAGE_NAME}:\$tag || true
             done
             """
         }
