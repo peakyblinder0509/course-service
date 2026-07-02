@@ -37,20 +37,20 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=course-service \
-                        -Dsonar.projectName=course-service \
-                        -Dsonar.projectVersion=1.0 \
+                        -Dsonar.projectKey=CRM-ADMINPANEL \
+                        -Dsonar.projectName=CRM-ADMINPANEL \
                         -Dsonar.sources=. \
-                        -Dsonar.exclusions=node_modules/**,build/**
+                        -Dsonar.exclusions=node_modules/,dist/ \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
                     """
                 }
             }
         }
-
+ 
         stage('Quality Gate') {
             steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true, credentialsId: 'sonar-crd'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
