@@ -5,7 +5,7 @@ pipeline {
         SCANNER_HOME = tool 'sonar-scanner'
         IMAGE_NAME = "my-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        HARBOR_URL = "harbor-node1.com"
+        HARBOR_URL = "172.17.0.1"
         PROJECT    = "crm-adminpanel"
     }
 
@@ -34,7 +34,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonar-scanner') {
+                withSonarQubeEnv('SonarQube') {
                     sh """
                         ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=course-service \
@@ -70,7 +70,7 @@ pipeline {
         stage('Docker Login Harbor') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'harbor-creds',
+                    credentialsId: 'harbor-crd',
                     usernameVariable: 'HARBOR_USER',
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
