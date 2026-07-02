@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SCANNER_HOME = tool 'sonar-scanner'
+        SCANNER_HOME = tool 'SonarScanner'
         IMAGE_NAME = "my-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
         HARBOR_URL = "172.17.0.1"
