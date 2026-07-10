@@ -6,7 +6,7 @@ pipeline {
         IMAGE_NAME = "my-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
         HARBOR_URL = "harbor-node1.com"
-        PROJECT    = "crm-adminpanel"
+        PROJECT    = "test-project1"
         HARBOR     = "robot$test-project1+harbor-1"
     }
 
