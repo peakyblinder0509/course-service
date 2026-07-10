@@ -37,7 +37,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                        ${SCANNER_HOME}/bin/Sonar-Scanner \
+                        ${SCANNER_HOME}/bin/sonar-scanner \
                         -Dsonar.projectKey=CRM-ADMINPANEL \
                         -Dsonar.projectName=CRM-ADMINPANEL \
                         -Dsonar.sources=. \
