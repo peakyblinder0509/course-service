@@ -5,7 +5,7 @@ pipeline {
         SCANNER_HOME = tool 'SonarScanner'
         IMAGE_NAME = "my-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        HARBOR_URL = "10.135.198.110"
+        HARBOR_URL = "harbor-node1.com"
         PROJECT    = "crm-adminpanel"
         HARBOR     = "robot$test-project1+harbor-1"
     }
