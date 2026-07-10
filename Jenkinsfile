@@ -7,7 +7,7 @@ pipeline {
         IMAGE_TAG  = "${BUILD_NUMBER}"
         HARBOR_URL = "10.135.198.110"
         PROJECT    = "crm-adminpanel"
-        HARBOR     = "robot$test-project1+test2"
+        HARBOR     = "robot$test-project1+harbor-1"
     }
 
     stages {
