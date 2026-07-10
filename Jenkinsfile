@@ -5,8 +5,9 @@ pipeline {
         SCANNER_HOME = tool 'SonarScanner'
         IMAGE_NAME = "my-app"
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        HARBOR_URL = "172.17.0.1"
+        HARBOR_URL = "10.135.198.110"
         PROJECT    = "crm-adminpanel"
+        HARBOR     = "robot$test-project1+harbor-1"
     }
 
     stages {
@@ -14,7 +15,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'git-cred',
+                    credentialsId: 'git-crd',
                     url: 'https://github.com/peakyblinder0509/course-service.git'
             }
         }
@@ -36,7 +37,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh """
-                        ${SCANNER_HOME}/bin/sonar-scanner \
+                        ${SCANNER_HOME}/bin/Sonar-Scanner \
                         -Dsonar.projectKey=CRM-ADMINPANEL \
                         -Dsonar.projectName=CRM-ADMINPANEL \
                         -Dsonar.sources=. \
@@ -70,7 +71,7 @@ pipeline {
         stage('Docker Login Harbor') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'harbor-crd',
+                    credentialsId: 'test-harbor',
                     usernameVariable: 'HARBOR_USER',
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
